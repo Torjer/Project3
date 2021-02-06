@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ContactView">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal"
+        android:background="@color/colorDark">
+        <TextView
+            android:id="@+id/name_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/name_txt"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"
+            android:textSize="10dp"
+            android:layout_marginLeft="25dp"
+            android:padding="12dp"/>
+        <TextView
+            android:id="@+id/phone_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/phone_txt"
+            android:layout_marginLeft="80dp"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"
+            android:textSize="12dp"
+            android:padding="10dp"/>
+        <TextView
+            android:id="@+id/email_btn"
+            android:layout_marginLeft="70dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/email_txt"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"
+            android:textSize="12dp"
+            android:padding="10dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginTop="100dp">
+
+        <Button
+            android:id="@+id/add_button"
+            android:layout_width="72dp"
+            android:layout_height="29dp"
+            android:layout_marginRight="20dp"
+            android:background="@color/colorAccent"
+            android:text="@string/add_txt"
+            android:textColor="@color/colorDark"
+            android:textSize="10dp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/modify_button"
+            android:layout_width="72dp"
+            android:layout_height="29dp"
+            android:layout_marginRight="20dp"
+            android:background="@color/colorAccent"
+
+            android:text="@string/modify_txt"
+            android:textColor="@color/colorDark"
+            android:textSize="10dp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/delete_button"
+            android:layout_width="72dp"
+            android:layout_height="29dp"
+            android:background="@color/colorAccent"
+            android:text="@string/delete_txt"
+            android:textColor="@color/colorDark"
+            android:textSize="10dp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</LinearLayout>

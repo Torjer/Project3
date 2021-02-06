@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">Project3</string>
+    <string name="app_name">MyContactsApp</string>
+    <string name="view_txt">VIEW CONTACTS</string>
+    <string name="add_txt">ADD</string>
+    <string name="modify_txt">MODIFY</string>
+    <string name="delete_txt">DELETE</string>
+    <string name="name_txt">NAME</string>
+    <string name="email_txt">E-MAIL</string>
+    <string name="phone_txt">PHONE</string>
 </resources>
