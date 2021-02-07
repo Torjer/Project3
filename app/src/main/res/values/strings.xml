@@ -7,4 +7,5 @@
     <string name="name_txt">NAME</string>
     <string name="email_txt">E-MAIL</string>
     <string name="phone_txt">PHONE</string>
+    <string name="addcontact_txt"> ADD CONTACT</string>
 </resources>
