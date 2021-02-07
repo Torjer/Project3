@@ -5,7 +5,11 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -30,10 +34,25 @@ class ContactView : AppCompatActivity() {
         }
     }
 
+    private lateinit var AddBtn: Button
+    private lateinit var SaveBtn: Button
+    private lateinit var ModBtn: Button
+    private lateinit var DelBtn: Button
+
+    private var Contactos = mutableListOf<String>()
+    private var added = mutableListOf<String>()
+    private var deleted = mutableListOf<String>()
+    private var SelectedItem:String = " "
+    private var SelectedContact:String = " "
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_contact_view)
+
+        AddBtn = findViewById(R.id.add_button)
+        DelBtn = findViewById(R.id.delete_button)
+        SaveBtn = findViewById(R.id.save_button)
+        ModBtn = findViewById(R.id.modify_button)
 
         val fullName = intent.getStringArrayExtra(EXTRA_NAME_INFO)
         val mail = intent.getStringArrayExtra(EXTRA_MAIL_INFO)
@@ -48,12 +67,11 @@ class ContactView : AppCompatActivity() {
             //Contact("Olivia Molina", 9991923465, "molivia@gmail.com")
         )
 
+
         phone?.forEach {
             contactsList.add(Contact(fullName!![i] , it.toLong(), mail!![i]) )
             i++
         }
-
-
 
         viewManager = LinearLayoutManager(this)
         viewAdapter = ContactsAdapter(contactsList)
@@ -64,5 +82,28 @@ class ContactView : AppCompatActivity() {
             layoutManager = LinearLayoutManager(this@ContactView)
             adapter = viewAdapter
         }
+        AddBtn.setOnClickListener { _->
+            val dialog = AlertDialog.Builder(this)
+            val dialogLayout = layoutInflater.inflate(R.layout.add_contact_layout, null)
+            val editName = dialogLayout.findViewById<EditText>(R.id.new_contact)
+            val editPhone =  dialogLayout.findViewById<EditText>(R.id.new_phone)
+            val editEmail =  dialogLayout.findViewById<EditText>(R.id.new_email)
+            with(dialog){
+                setTitle("Add Contact")
+                setPositiveButton("OK"){
+                        dialog, which ->
+                    contactsList.add(Contact(editName.text.toString(), editPhone.text.toString().toLong(), editEmail.text.toString()))
+                    viewAdapter.notifyDataSetChanged()
+                }
+                setNegativeButton("Cancel"){dialog, which ->
+                    Log.d("Main","Negative")
+                }
+                setView(dialogLayout)
+                show()
+            }
+
+        }
+
+
     }
 }
