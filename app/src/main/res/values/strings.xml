@@ -4,6 +4,7 @@
     <string name="add_txt">ADD</string>
     <string name="modify_txt">MODIFY</string>
     <string name="delete_txt">DELETE</string>
+    <string name="save_txt">SAVE</string>
     <string name="name_txt">NAME</string>
     <string name="email_txt">E-MAIL</string>
     <string name="phone_txt">PHONE</string>
