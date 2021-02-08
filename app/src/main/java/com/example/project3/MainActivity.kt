@@ -70,6 +70,14 @@ class MainActivity : AppCompatActivity() {
              //all = JSONObject(JSONArray(response.body).getString(0)).getString("age")
         }
 
+//        doAsync {
+//            val response = Unirest.post("https://contactsdb-0225.restdb.io/rest/contacts")
+//                .header("content-type", "application/json")
+//                .header("x-apikey", "5d915cec62b71c981ecaa0548e9bf18c3c7d8")
+//                .header("cache-control", "no-cache")
+//                .body("{\"fullName\":\"xyz\",\"mail\":\"abc@abc.com\",\"number\":\"12345678\"}")
+//                .asString()
+//        }
 
 //
         //val allRes = JSONObject(response.body).getString("age")
