@@ -9,10 +9,15 @@ import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.project3.ContactView.Companion.createIntent
+import com.mashape.unirest.http.HttpResponse
+import com.mashape.unirest.http.Unirest
+import org.jetbrains.anko.doAsync
+import org.json.JSONArray
 import org.json.JSONObject
 import java.nio.file.Files.size
 
@@ -28,13 +33,15 @@ class ContactView : AppCompatActivity() {
         const val EXTRA_NAME_INFO = "com.example.project3.fullName_info"
         const val EXTRA_MAIL_INFO = "com.example.project3.mail_info"
         const val EXTRA_PHONE_INFO = "com.example.project3.phone_info"
+        const val EXTRA_ID_INFO = "com.example.project3.id_info"
 
         fun createIntent(
-            packageContext: Context, fullNameInfo: Array<String>, mailInfo: Array<String>, phoneInfo: Array<String>): Intent {
+            packageContext: Context, idInfo:Array<String>, fullNameInfo: Array<String>, mailInfo: Array<String>, phoneInfo: Array<String>): Intent {
             return Intent(packageContext, ContactView::class.java).apply{
                 putExtra(EXTRA_NAME_INFO, fullNameInfo)
                 putExtra(EXTRA_MAIL_INFO, mailInfo)
                 putExtra(EXTRA_PHONE_INFO, phoneInfo)
+                putExtra(EXTRA_ID_INFO, idInfo)
             }
         }
     }
@@ -63,13 +70,23 @@ class ContactView : AppCompatActivity() {
         val fullName = intent.getStringArrayExtra(EXTRA_NAME_INFO)
         val mail = intent.getStringArrayExtra(EXTRA_MAIL_INFO)
         val phone = intent.getStringArrayExtra(EXTRA_PHONE_INFO)
+        val idList = intent.getStringArrayExtra(EXTRA_ID_INFO)
+        var tempId = mutableListOf<String>()
         var i = 0
 
         val contactsList = mutableListOf<Contact>()
 
+        //getResponse()
+
         phone?.forEach {
-            contactsList.add(Contact(fullName!![i] , it.toLong(), mail!![i]) )
+            contactsList.add(Contact( idList!![i],fullName!![i] , it.toLong(), mail!![i]) )
+            tempId.add(idList[i])
             i++
+        }
+
+        if(position <0){
+            DelBtn.isEnabled = false
+            ModBtn.isEnabled = false
         }
 
         viewManager = LinearLayoutManager(this)
@@ -87,12 +104,24 @@ class ContactView : AppCompatActivity() {
             val editName = dialogLayout.findViewById<EditText>(R.id.new_contact)
             val editPhone =  dialogLayout.findViewById<EditText>(R.id.new_phone)
             val editEmail =  dialogLayout.findViewById<EditText>(R.id.new_email)
+            //val id = JSONObject(JSONArray(response.body).getString(position)).getString("_id")
             with(dialog){
                 setTitle("Add Contact")
                 setPositiveButton("OK"){
                         dialog, which ->
-                    contactsList.add(Contact(editName.text.toString(), editPhone.text.toString().toLong(), editEmail.text.toString()))
+                    var tempid = ""
+                    doAsync {
+                        val response = Unirest.post("https://contactsdb-0225.restdb.io/rest/contacts")
+                            .header("content-type", "application/json")
+                            .header("x-apikey", "5d915cec62b71c981ecaa0548e9bf18c3c7d8")
+                            .header("cache-control", "no-cache")
+                            .body("{\"fullName\":\"${editName.text.toString()}\", \"mail\":\"${editEmail.text.toString()}\", \"number\":\"${editPhone.text.toString()}\"}")
+                            .asString();
+                        tempId.add(JSONObject(response.body).getString("_id"))
+                    }
+                    contactsList.add(Contact( tempid, editName.text.toString(), editPhone.text.toString().toLong(), editEmail.text.toString()))
                     viewAdapter.notifyDataSetChanged()
+                    //getResponse()
                 }
                 setNegativeButton("Cancel"){dialog, which ->
                     Log.d("Main","Negative")
@@ -111,9 +140,22 @@ class ContactView : AppCompatActivity() {
             val editEmail =  dialogLayout.findViewById<EditText>(R.id.new_email)
             with(dialog){
                 setTitle("Modify Contact?")
-                setPositiveButton("OK"){
-                        dialog, which ->
-                    contactsList.add(Contact(editName.text.toString(), editPhone.text.toString().toLong(), editEmail.text.toString()))
+                setPositiveButton("OK"){dialog, which ->
+                    val id = tempId[position]
+                    contactsList.forEach {
+                        if(it.fullName==contactsList[position].fullName){
+                            //contactsList[position]=Contact( editName.text.toString(), editPhone.text.toString().toLong(), editEmail.text.toString())
+                            doAsync {
+                               val response = Unirest.put("https://contactsdb-0225.restdb.io/rest/contacts/$id")
+                                    .header("content-type", "application/json")
+                                    .header("x-apikey", "5d915cec62b71c981ecaa0548e9bf18c3c7d8")
+                                    .header("cache-control", "no-cache")
+                                    .body("{\"fullName\":\"${editName.text.toString()}\", \"mail\":\"${editEmail.text.toString()}\", \"number\":\"${editPhone.text.toString()}\"}")
+                                    .asString();
+                            }
+                        }
+                    }
+                    contactsList[position]= Contact( id, editName.text.toString(), editPhone.text.toString().toLong(), editEmail.text.toString())
                     viewAdapter.notifyDataSetChanged()
                 }
                 setNegativeButton("Cancel"){dialog, which ->
@@ -124,14 +166,21 @@ class ContactView : AppCompatActivity() {
             }
 
         }
-        if(position <0){ DelBtn.isEnabled = false}
-        else{DelBtn.isEnabled = true}
         DelBtn.setOnClickListener { _->
             val dialog = AlertDialog.Builder(this)
             with(dialog) {
                 dialog.setTitle("Do you want to delete this contact?")
+                val id = tempId[position]
+                tempId.removeAt(position)
                 setPositiveButton("Delete"){dialog, wich ->
                     contactsList.removeAt(position)
+                    doAsync {
+                        val response = Unirest.delete("https://contactsdb-0225.restdb.io/rest/contacts/$id")
+                            .header("content-type", "application/json")
+                            .header("x-apikey", "5d915cec62b71c981ecaa0548e9bf18c3c7d8")
+                            .header("cache-control", "no-cache")
+                            .asString()
+                    }
                     viewAdapter.notifyDataSetChanged()
                 }
                 setNegativeButton("Cancel"){dialog, which ->
@@ -142,17 +191,7 @@ class ContactView : AppCompatActivity() {
         }
 
         SaveBtn.setOnClickListener {
-            val returningNamesList = mutableListOf<String>()
-            val returningMailsList = mutableListOf<String>()
-            val returningNumbersList = mutableListOf<String>()
-            var j = 0
-            while(j<contactsList.size){
-                returningNamesList.add(contactsList[j].fullName)
-                returningMailsList.add(contactsList[j].mail)
-                returningNumbersList.add(contactsList[j].phoneNumber.toString())
-                j++
-            }
-
+            finish()
         }
     }
 
@@ -164,4 +203,14 @@ class ContactView : AppCompatActivity() {
         DelBtn.isEnabled = true
         ModBtn.isEnabled = true
     }
+
+    //fun getResponse(){
+    //    doAsync {
+    //        response = Unirest.get("https://contactsdb-0225.restdb.io/rest/contacts")
+    //            .header("x-apikey", "5d915cec62b71c981ecaa0548e9bf18c3c7d8")
+    //            .header("cache-control", "no-cache").asString()
+//
+    //    }
+    //}
+
 }
