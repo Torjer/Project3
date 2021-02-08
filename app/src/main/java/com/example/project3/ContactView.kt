@@ -82,10 +82,12 @@ class ContactView : AppCompatActivity() {
 
         recyclerView = findViewById<RecyclerView>(R.id.info_rv).apply {
             setHasFixedSize(true)
-
             layoutManager = LinearLayoutManager(this@ContactView)
             adapter = viewAdapter
         }
+
+        recyclerView.setOn
+
         AddBtn.setOnClickListener { _->
             val dialog = AlertDialog.Builder(this)
             val dialogLayout = layoutInflater.inflate(R.layout.add_contact_layout, null)
@@ -122,6 +124,8 @@ class ContactView : AppCompatActivity() {
             startActivityForResult(MainActivity.createIntent(this,returningNamesList.toTypedArray(),
                 returningMailsList.toTypedArray(), returningNumbersList.toTypedArray()), CONTACT_ACTIVITY_REQUEST_CODE)
         }
+
+
 
 
     }
