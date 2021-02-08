@@ -12,6 +12,10 @@ import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.project3.ContactView.Companion.createIntent
+import org.json.JSONObject
+
+private const val CONTACT_ACTIVITY_REQUEST_CODE = 1
 
 class ContactView : AppCompatActivity() {
 
@@ -102,6 +106,21 @@ class ContactView : AppCompatActivity() {
                 show()
             }
 
+        }
+
+        SaveBtn.setOnClickListener {
+            val returningNamesList = mutableListOf<String>()
+            val returningMailsList = mutableListOf<String>()
+            val returningNumbersList = mutableListOf<String>()
+            var j = 0
+            while(j<contactsList.size){
+                returningNamesList.add(contactsList[j].fullName)
+                returningMailsList.add(contactsList[j].mail)
+                returningNumbersList.add(contactsList[j].phoneNumber.toString())
+                j++
+            }
+            startActivityForResult(MainActivity.createIntent(this,returningNamesList.toTypedArray(),
+                returningMailsList.toTypedArray(), returningNumbersList.toTypedArray()), CONTACT_ACTIVITY_REQUEST_CODE)
         }
 
 

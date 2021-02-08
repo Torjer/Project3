@@ -1,17 +1,15 @@
 package com.example.project3
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.mashape.unirest.http.Unirest
-import org.jetbrains.anko.activityUiThread
 import org.jetbrains.anko.doAsync
 import org.json.JSONArray
 import org.json.JSONObject
-import java.net.URL
-import javax.net.ssl.HttpsURLConnection
 
 private const val CONTACT_ACTIVITY_REQUEST_CODE = 0;
 
@@ -22,12 +20,31 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tempArray : JSONArray
 
 
+    companion object{
+        const val EXTRA_RETURNING_NAME_INFO = "com.example.project3.returningFullName_info"
+        const val EXTRA_RETURNING_MAIL_INFO = "com.example.project3.returningMail_info"
+        const val EXTRA_RETURNING_PHONE_INFO = "com.example.project3.returningPhone_info"
+
+        fun createIntent(
+            packageContext: Context, returningFullNameInfo: Array<String>, returningMailInfo: Array<String>, returningPhoneInfo: Array<String>): Intent {
+            return Intent(packageContext, MainActivity::class.java).apply{
+                putExtra(EXTRA_RETURNING_NAME_INFO, returningFullNameInfo)
+                putExtra(EXTRA_RETURNING_MAIL_INFO, returningMailInfo)
+                putExtra(EXTRA_RETURNING_PHONE_INFO, returningPhoneInfo)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         viewButton = findViewById(R.id.view_button)
         testText = findViewById(R.id.test)
+
+        val returningFullName = intent.getStringArrayExtra(EXTRA_RETURNING_NAME_INFO)
+        val returningMail = intent.getStringArrayExtra(EXTRA_RETURNING_MAIL_INFO)
+        val returningPhone = intent.getStringArrayExtra(EXTRA_RETURNING_PHONE_INFO)
 
         viewButton.setOnClickListener { _->
             val size = tempArray.length()
@@ -52,6 +69,7 @@ class MainActivity : AppCompatActivity() {
             tempArray = JSONArray(response.body)
              //all = JSONObject(JSONArray(response.body).getString(0)).getString("age")
         }
+
 
 //
         //val allRes = JSONObject(response.body).getString("age")
