@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.project3.ContactView.Companion.createIntent
 import org.json.JSONObject
+import java.nio.file.Files.size
 
 private const val CONTACT_ACTIVITY_REQUEST_CODE = 1
 
@@ -42,7 +43,7 @@ class ContactView : AppCompatActivity() {
     private lateinit var SaveBtn: Button
     private lateinit var ModBtn: Button
     private lateinit var DelBtn: Button
-    private var position = 0
+    private var position = -1
 
     private var added = mutableListOf<String>()
     private var modfif = mutableListOf<String>()
@@ -109,7 +110,7 @@ class ContactView : AppCompatActivity() {
             val editPhone =  dialogLayout.findViewById<EditText>(R.id.new_phone)
             val editEmail =  dialogLayout.findViewById<EditText>(R.id.new_email)
             with(dialog){
-                setTitle("Change Contact")
+                setTitle("Modify Contact?")
                 setPositiveButton("OK"){
                         dialog, which ->
                     contactsList.add(Contact(editName.text.toString(), editPhone.text.toString().toLong(), editEmail.text.toString()))
@@ -122,6 +123,22 @@ class ContactView : AppCompatActivity() {
                 show()
             }
 
+        }
+        if(position <0){ DelBtn.isEnabled = false}
+        else{DelBtn.isEnabled = true}
+        DelBtn.setOnClickListener { _->
+            val dialog = AlertDialog.Builder(this)
+            with(dialog) {
+                dialog.setTitle("Do you want to delete this contact?")
+                setPositiveButton("Delete"){dialog, wich ->
+                    contactsList.removeAt(position)
+                    viewAdapter.notifyDataSetChanged()
+                }
+                setNegativeButton("Cancel"){dialog, which ->
+                    Log.d("Main","Negative")
+                }
+                show()
+            }
         }
 
         SaveBtn.setOnClickListener {
@@ -141,5 +158,10 @@ class ContactView : AppCompatActivity() {
 
     fun getItem(Position : Int){
         position = Position
+    }
+
+    fun updateButtons(){
+        DelBtn.isEnabled = true
+        ModBtn.isEnabled = true
     }
 }
