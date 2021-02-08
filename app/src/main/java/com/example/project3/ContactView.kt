@@ -42,9 +42,10 @@ class ContactView : AppCompatActivity() {
     private lateinit var SaveBtn: Button
     private lateinit var ModBtn: Button
     private lateinit var DelBtn: Button
+    private var position = 0
 
-    private var Contactos = mutableListOf<String>()
     private var added = mutableListOf<String>()
+    private var modfif = mutableListOf<String>()
     private var deleted = mutableListOf<String>()
     private var SelectedItem:String = " "
     private var SelectedContact:String = " "
@@ -63,14 +64,7 @@ class ContactView : AppCompatActivity() {
         val phone = intent.getStringArrayExtra(EXTRA_PHONE_INFO)
         var i = 0
 
-        val contactsList = mutableListOf<Contact>(
-            //Contact("Mariana Lopez", 9991946753, "marlo@correo.com" )
-            //Contact("Esteban Díaz", 9991973227, "ediaz@gmail.com"),
-            //Contact("Nina Mendez", 9992347567, "ninamendez@hotmail.com"),
-            //Contact("Maximiliano Torres", 9991005533, "maxto@correo.com"),
-            //Contact("Olivia Molina", 9991923465, "molivia@gmail.com")
-        )
-
+        val contactsList = mutableListOf<Contact>()
 
         phone?.forEach {
             contactsList.add(Contact(fullName!![i] , it.toLong(), mail!![i]) )
@@ -78,16 +72,14 @@ class ContactView : AppCompatActivity() {
         }
 
         viewManager = LinearLayoutManager(this)
-        viewAdapter = ContactsAdapter(contactsList)
+        viewAdapter = ContactsAdapter(this,contactsList)
 
         recyclerView = findViewById<RecyclerView>(R.id.info_rv).apply {
             setHasFixedSize(true)
+
             layoutManager = LinearLayoutManager(this@ContactView)
             adapter = viewAdapter
         }
-
-        recyclerView.setOn
-
         AddBtn.setOnClickListener { _->
             val dialog = AlertDialog.Builder(this)
             val dialogLayout = layoutInflater.inflate(R.layout.add_contact_layout, null)
@@ -96,6 +88,28 @@ class ContactView : AppCompatActivity() {
             val editEmail =  dialogLayout.findViewById<EditText>(R.id.new_email)
             with(dialog){
                 setTitle("Add Contact")
+                setPositiveButton("OK"){
+                        dialog, which ->
+                    contactsList.add(Contact(editName.text.toString(), editPhone.text.toString().toLong(), editEmail.text.toString()))
+                    viewAdapter.notifyDataSetChanged()
+                }
+                setNegativeButton("Cancel"){dialog, which ->
+                    Log.d("Main","Negative")
+                }
+                setView(dialogLayout)
+                show()
+            }
+
+        }
+
+        ModBtn.setOnClickListener { _->
+            val dialog = AlertDialog.Builder(this)
+            val dialogLayout = layoutInflater.inflate(R.layout.add_contact_layout, null)
+            val editName = dialogLayout.findViewById<EditText>(R.id.new_contact)
+            val editPhone =  dialogLayout.findViewById<EditText>(R.id.new_phone)
+            val editEmail =  dialogLayout.findViewById<EditText>(R.id.new_email)
+            with(dialog){
+                setTitle("Change Contact")
                 setPositiveButton("OK"){
                         dialog, which ->
                     contactsList.add(Contact(editName.text.toString(), editPhone.text.toString().toLong(), editEmail.text.toString()))
@@ -121,12 +135,11 @@ class ContactView : AppCompatActivity() {
                 returningNumbersList.add(contactsList[j].phoneNumber.toString())
                 j++
             }
-            startActivityForResult(MainActivity.createIntent(this,returningNamesList.toTypedArray(),
-                returningMailsList.toTypedArray(), returningNumbersList.toTypedArray()), CONTACT_ACTIVITY_REQUEST_CODE)
+
         }
+    }
 
-
-
-
+    fun getItem(Position : Int){
+        position = Position
     }
 }
